@@ -15,9 +15,9 @@ fps = 30 # Fps del juego
 fuente = pygame.font.match_font('arial') # fuente arial
 
 
-
 #---------------------------------------variables-----------------------------------------------
 reg_peces = [] # Almacena las instancias de los peces
+puntos = 0
 
 
 #---------------------------------------Cargar imagenes----------------------------------------
@@ -31,10 +31,8 @@ pygame.image.load("images/pez rojo.png"),  # Carga imagen de pez rojo
 pygame.image.load("images/pez verde.png")] # Carga imagen de pez verde
 imagenes_peces[0] = pygame.transform.scale(imagenes_peces[0], (59, 53)) # Escalar la imagen pez azul
 imagenes_peces[1] = pygame.transform.scale(imagenes_peces[1], (67, 51)) # Escalar la imagen pez morado
-sprite_anzuelo = pygame.sprite.Sprite() # definir sprite del anzuelo
 img_anzuelo = [pygame.image.load("images/canna.png"), pygame.image.load("images/canna_carnada.png")] # Carga imagen de anzuelo vacio (0) y con carnada (1)
-sprite_anzuelo.image = img_anzuelo[0] # darle una imagen al sprite del anzuelo
-sprite_anzuelo.rect = img_anzuelo[0].get_rect() # darle un rectangulo al sprite
+rectangulo_anzuelo = img_anzuelo[0].get_rect() # obtiene el rectangulo del anzuelo
 
 
 screen = pygame.display.set_mode(size) # Iniciar la ventana
@@ -72,16 +70,18 @@ xf = 1
 #---Clases-------------------------------------------------------------------------------------------
 class Anzuelo:
     def __init__(self):
-        global img_anzuelo
+        global img_anzuelo, rectangulo_anzuelo
         self.xAnz = 340 # posicion en X del anzuelo
         self.Yanz = 200  # posicion Y del anzuelo
+        rectangulo_anzuelo.left = self.xAnz # le da posicion en X al rectangulo
+        rectangulo_anzuelo.top = self.Yanz # le da posicion en Y al rectangulo
 
     def mostrar(self): # Funcion para mostrar la imagen del anzuelo
         mouse_pos = pygame.mouse.get_pos() # recupera posicion del mouse
         if mouse_pos[1] > 65 and mouse_pos[1] < 460: # Limite Y del anzuelo
-            self.Yanz = mouse_pos[1] - 25  # Actualiza la posicion del anzuelo
-        screen.blit(img_anzuelo[0], [self.xAnz, self.Yanz]) # Muestra puntero --> anzuelo
-        pygame.draw.line(screen, (0, 0, 0), [360, 55], [360, self.Yanz + 15], 1) # dibujar la linea del anzuelo
+            rectangulo_anzuelo.top = mouse_pos[1] - 25  # Actualiza la posicion del anzuelo
+        screen.blit(img_anzuelo[0], rectangulo_anzuelo) # Muestra puntero --> anzuelo
+        pygame.draw.line(screen, (0, 0, 0), [360, 55], [360, rectangulo_anzuelo.top + 15], 1) # dibujar la linea del anzuelo
 
 
 class Peces:
@@ -97,23 +97,27 @@ class Peces:
             self.x = 700
             self.velocidad = -1 # Cambia la direccion en la que se mueve el pez
         self.rectangulo = imagenes_peces[self.tipo].get_rect() # Guarda el rectangulo de pez
+        self.rectangulo.left = self.x # darle posicion al rectangulo en X
+        self.rectangulo.top = self.y
         
     def mos(self): # Metodo para mostrar la imagen
+        global puntos
         img = imagenes_peces[self.tipo] # Guarda la imagen del pes
         if self.velocidad > 0:
             img = pygame.transform.flip(img, True, False) # Si avanza a la derecha, le da la vuelta a la imagen
-        screen.blit(img, (self.x, self.y)) # Mostrar imagen del pez
-        if self.x < -55 or self.x > 720: # Verifica que la instancia se encuentre dentro de los limites
+        screen.blit(img, self.rectangulo) # Mostrar imagen del pez
+
+    def Eliminar(self): # Metodo para eliminar la entidad si sobrepasa los limites
+        global puntos
+        if self.rectangulo.left < -55 or self.rectangulo.left > 720: # Verifica que la instancia se encuentre dentro de los limites
+            reg_peces.remove(self) # Elimina la instancia del registro
+        if self.rectangulo.colliderect(rectangulo_anzuelo): # verifica si esta colisonando con el anzuelo
+            puntos += 1 # suma la cantidad de puntos
             reg_peces.remove(self) # Elimina la instancia del registro
 
     def movimiento(self): # Metodo para mover la imagen
-        self.x += 2*self.velocidad # Aumenta o reduce la pocision en X dependiento de la velocidad
-        if self.rectangulo.colliderect(rectangulo_anzuelo): # Verifica si colisiono con el anzuelo
-            print('SI')
-
-    def Eliminar(self): # Metodo para eliminar la entidad si sobrepasa los limites
-        reg_peces.remove(self) # Elimina la instancia del registro
-
+        self.rectangulo.left += 2*self.velocidad # Aumenta o reduce la pocision en X dependiento de la velocidad
+        
 Crear_pez(0)
 Crear_pez(1)
 Crear_pez(0)
@@ -150,12 +154,13 @@ while pantalla == 2:
 
     screen.blit(img_fondo_mar, (0, 0)) # Mostrar fondo "mar"
 
-    muestra_texto("Hola", 48, 360, 20) # Muestra el texto de la puntuacion
+    muestra_texto(str(puntos), 48, 360, 20) # Muestra el texto de la puntuacion
 
     ind_registro = len(reg_peces) - 1 # Indice del registro
     while ind_registro != -1: # Actualiza los metodos de cada instancia "peces"
         reg_peces[ind_registro].movimiento() # Llama a la funcion para mover el pez
         reg_peces[ind_registro].mos() # llama a la funcion para visualizar el pez
+        reg_peces[ind_registro].Eliminar() # Elimina la intancia si es necesario
         ind_registro -= 1 # Disminuye en uno el numero de indices
     
     anz.mostrar() # muestra el anzuelo en la pantalla
