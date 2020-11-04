@@ -17,7 +17,8 @@ fuente = pygame.font.match_font('arial') # fuente arial
 
 #---------------------------------------variables-----------------------------------------------
 reg_peces = [] # Almacena las instancias de los peces
-puntos = 0
+puntos = 0 # numero de puntos
+estado_anzuelo = 1 # estados del anzuelo (0:sin carnada, 1:con carnada, 2:con pez)
 
 
 #---------------------------------------Cargar imagenes----------------------------------------
@@ -42,12 +43,12 @@ pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 #---Funciones-------------------------------------------------------------------------------------
 def muestra_texto(texto, dimensiones, x, y):
     global fuente
-    tipo_letra = pygame.font.Font(fuente, dimensiones)
-    superficie = tipo_letra.render(texto, True, (0, 0, 0))
-    rectangulo = superficie.get_rect()
-    rectangulo.centerx = x
+    tipo_letra = pygame.font.Font(fuente, dimensiones) # defin el tipo de letra del texto
+    superficie = tipo_letra.render(texto, True, (0, 0, 0)) # crea la imagen del texto
+    rectangulo = superficie.get_rect() # recupera el rectangulo de la imagen del texto
+    rectangulo.centerx = x 
     rectangulo.centery = y
-    screen.blit(superficie, rectangulo)
+    screen.blit(superficie, rectangulo) # muestra la imagen del texto
     
 def Crear_boton_jugar(x, y, pre): # Funcion que crear el boton jugar
     screen.blit(img_boton_jugar, (x, y)) # Mostrar el boton jugar
@@ -71,17 +72,29 @@ xf = 1
 class Anzuelo:
     def __init__(self):
         global img_anzuelo, rectangulo_anzuelo
+        self.conCarnada = 1 # para saber cuando tiene o no carnada
+        self.imagenSi = img_anzuelo[0] # se define como imagen iniciar, el anzuelo con carnada
         self.xAnz = 340 # posicion en X del anzuelo
         self.Yanz = 200  # posicion Y del anzuelo
         rectangulo_anzuelo.left = self.xAnz # le da posicion en X al rectangulo
         rectangulo_anzuelo.top = self.Yanz # le da posicion en Y al rectangulo
 
     def mostrar(self): # Funcion para mostrar la imagen del anzuelo
+        global estado_anzuelo
+        self.conCarnada = estado_anzuelo
         mouse_pos = pygame.mouse.get_pos() # recupera posicion del mouse
         if mouse_pos[1] > 65 and mouse_pos[1] < 460: # Limite Y del anzuelo
             rectangulo_anzuelo.top = mouse_pos[1] - 25  # Actualiza la posicion del anzuelo
-        screen.blit(img_anzuelo[0], rectangulo_anzuelo) # Muestra puntero --> anzuelo
+        if self.conCarnada == 1: # verifica si tiene carnada o no
+            self.imagenSi = img_anzuelo[1] # como tiene carnada, muestra la imagen con carnada
+        else:
+            self.imagenSi = img_anzuelo[0] # como no tiene carnada, muestra la imagen sin carnada
+        screen.blit(self.imagenSi, rectangulo_anzuelo) # Muestra puntero --> anzuelo
         pygame.draw.line(screen, (0, 0, 0), [360, 55], [360, rectangulo_anzuelo.top + 15], 1) # dibujar la linea del anzuelo
+
+    def Actualizar_estado(self, x): # funcion para cambiar el estado del anzuelo (con carnada, sin carnada)
+        self.conCarnada = x
+
 
 
 class Peces:
@@ -108,10 +121,11 @@ class Peces:
         screen.blit(img, self.rectangulo) # Mostrar imagen del pez
 
     def Eliminar(self): # Metodo para eliminar la entidad si sobrepasa los limites
-        global puntos
+        global puntos, estado_anzuelo
         if self.rectangulo.left < -55 or self.rectangulo.left > 720: # Verifica que la instancia se encuentre dentro de los limites
             reg_peces.remove(self) # Elimina la instancia del registro
         if self.rectangulo.colliderect(rectangulo_anzuelo): # verifica si esta colisonando con el anzuelo
+            estado_anzuelo = 0
             puntos += 1 # suma la cantidad de puntos
             reg_peces.remove(self) # Elimina la instancia del registro
 
@@ -139,7 +153,14 @@ while pantalla == 1:
     #--Las imagenes van antes de esta linea
     pygame.display.update() # Actualiza la imagen de la ventana
 
+
+
 anz = Anzuelo()
+
+#---------Musica de fondo-----------------------------------------------------------------------------
+pygame.mixer.music.load("sounds/background_music.wav") # carga la musica de fondo
+pygame.mixer.music.play(5) # reproduce la cancion
+
 #-------- Ciclo de actualizacion de pantalla de juego----------------------------------------------------
 while pantalla == 2:
     reloj.tick(fps) # Velocidad a la que corre el juego
@@ -162,7 +183,7 @@ while pantalla == 2:
         reg_peces[ind_registro].mos() # llama a la funcion para visualizar el pez
         reg_peces[ind_registro].Eliminar() # Elimina la intancia si es necesario
         ind_registro -= 1 # Disminuye en uno el numero de indices
-    
+     
     anz.mostrar() # muestra el anzuelo en la pantalla
 
 
