@@ -13,12 +13,15 @@ reloj = pygame.time.Clock()
 pantalla = 1 # Pantalla de inicio (inicio, juego, resumen....)
 fps = 30 # Fps del juego
 fuente = pygame.font.match_font('arial') # fuente arial
+frecuencia = 1 # frecuencia de generacion de los peces en segundos
 
 
 #---------------------------------------variables-----------------------------------------------
 reg_peces = [] # Almacena las instancias de los peces
 puntos = 0 # numero de puntos
 estado_anzuelo = 1 # estados del anzuelo (0:sin carnada, 1:con carnada, 2:con pez)
+start_time_ticks = pygame.time.get_ticks() # tiempo de inicio del contador para la generacion de peces
+last_time_ticks = start_time_ticks # tiempo requerido inicial para generar peces es de 0 seg
 
 
 #---------------------------------------Cargar imagenes----------------------------------------
@@ -41,6 +44,14 @@ pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 
 
 #---Funciones-------------------------------------------------------------------------------------
+def Generar_peces(): # funcion para generar peces
+    global start_time_ticks, last_time_ticks, frecuencia
+    last_time_ticks = pygame.time.get_ticks() # se le asigna al ultimo ticks, los ticks actuales
+    print(last_time_ticks, start_time_ticks)
+    if last_time_ticks >= start_time_ticks + (frecuencia*1000): # verifica si el tiempo actual es mayor al tiempo inicial mas la frecuencia
+        start_time_ticks = pygame.time.get_ticks() # para que se inicie de nuevo el contador
+        Crear_pez(randrange(0,2)) # crea una instancia de los peces
+
 def muestra_texto(texto, dimensiones, x, y):
     global fuente
     tipo_letra = pygame.font.Font(fuente, dimensiones) # defin el tipo de letra del texto
@@ -125,7 +136,7 @@ class Peces:
         if self.rectangulo.left < -55 or self.rectangulo.left > 720: # Verifica que la instancia se encuentre dentro de los limites
             reg_peces.remove(self) # Elimina la instancia del registro
         if self.rectangulo.colliderect(rectangulo_anzuelo): # verifica si esta colisonando con el anzuelo
-            estado_anzuelo = 0
+            estado_anzuelo = 0 # cambia el estado del anzuelo a uno sin caranda
             puntos += 1 # suma la cantidad de puntos
             reg_peces.remove(self) # Elimina la instancia del registro
 
@@ -146,6 +157,7 @@ while pantalla == 1:
     screen.fill(color) # Rellena el fondo
     #--Las imagenes van despues de esta linea
 
+
     precionado = Crear_boton_jugar(220, 150, precionado)
     if precionado:
         pantalla = 2 # Cambia de pantalla
@@ -157,9 +169,12 @@ while pantalla == 1:
 
 anz = Anzuelo()
 
+
 #---------Musica de fondo-----------------------------------------------------------------------------
 pygame.mixer.music.load("sounds/background_music.wav") # carga la musica de fondo
+pygame.mixer.music.set_volume(0.6) # cambiamos el volumen
 pygame.mixer.music.play(5) # reproduce la cancion
+
 
 #-------- Ciclo de actualizacion de pantalla de juego----------------------------------------------------
 while pantalla == 2:
@@ -172,6 +187,7 @@ while pantalla == 2:
     screen.fill(color) # Rellena el fondo
     #--Las imagenes van despues de esta linea------------------------------
 
+    Generar_peces()
 
     screen.blit(img_fondo_mar, (0, 0)) # Mostrar fondo "mar"
 
