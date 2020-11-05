@@ -38,7 +38,6 @@ imagenes_peces[1] = pygame.transform.scale(imagenes_peces[1], (67, 51)) # Escala
 img_anzuelo = [pygame.image.load("images/canna.png"), pygame.image.load("images/canna_carnada.png")] # Carga imagen de anzuelo vacio (0) y con carnada (1)
 rectangulo_anzuelo = img_anzuelo[0].get_rect() # obtiene el rectangulo del anzuelo
 
-
 screen = pygame.display.set_mode(size) # Iniciar la ventana
 pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 
@@ -47,7 +46,6 @@ pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 def Generar_peces(): # funcion para generar peces
     global start_time_ticks, last_time_ticks, frecuencia
     last_time_ticks = pygame.time.get_ticks() # se le asigna al ultimo ticks, los ticks actuales
-    print(last_time_ticks, start_time_ticks)
     if last_time_ticks >= start_time_ticks + (frecuencia*1000): # verifica si el tiempo actual es mayor al tiempo inicial mas la frecuencia
         start_time_ticks = pygame.time.get_ticks() # para que se inicie de nuevo el contador
         Crear_pez(randrange(0,2)) # crea una instancia de los peces
@@ -111,7 +109,9 @@ class Anzuelo:
 class Peces:
     def __init__(self, t, posA):
         global imagenes_peces, rectangulo_anzuelo
-        self.posArray = posA
+        self.muerto = False # define si debe borrarse o no la entidad
+        self.atrapado = False
+        self.posArray = posA # recupera su pocicion inicial en el array
         self.x = 0 # Posicion X inicial
         self.tipo = t # Tipo de pez, sirve para usarlo dentro de la variable que almacena las imagenes de los peces
         self.velocidad = 1 # Velocidad de desplazamiento
@@ -125,27 +125,40 @@ class Peces:
         self.rectangulo.top = self.y
         
     def mos(self): # Metodo para mostrar la imagen
-        global puntos
+        global puntos, estado_anzuelo
         img = imagenes_peces[self.tipo] # Guarda la imagen del pes
         if self.velocidad > 0:
             img = pygame.transform.flip(img, True, False) # Si avanza a la derecha, le da la vuelta a la imagen
+        if self.atrapado:
+            if self.velocidad > 0:
+                img = pygame.transform.rotate(img, 90) # rotar la imagen del pes
+            else:
+                img = pygame.transform.rotate(img, -90) # rotar la imagen del pes
         screen.blit(img, self.rectangulo) # Mostrar imagen del pez
-
-    def Eliminar(self): # Metodo para eliminar la entidad si sobrepasa los limites
-        global puntos, estado_anzuelo
-        if self.rectangulo.left < -55 or self.rectangulo.left > 720: # Verifica que la instancia se encuentre dentro de los limites
-            reg_peces.remove(self) # Elimina la instancia del registro
-        if self.rectangulo.colliderect(rectangulo_anzuelo): # verifica si esta colisonando con el anzuelo
+        if self.rectangulo.top < 70 and estado_anzuelo == 0:
+            self.muerto = True # el objeto debe eliminarse
+        if self.rectangulo.colliderect(rectangulo_anzuelo) and estado_anzuelo == 1: # verifica si esta colisonando con el anzuelo y si el anzuelo tiene carnada
             estado_anzuelo = 0 # cambia el estado del anzuelo a uno sin caranda
             puntos += 1 # suma la cantidad de puntos
+            #reg_peces.remove(self) # Elimina la instancia del registro
+            self.atrapado = True
+        
+    def Eliminar(self): # Metodo para eliminar la entidad si sobrepasa los limites
+        global estado_anzuelo
+        if self.rectangulo.left < -55 or self.rectangulo.left > 720: # Verifica que la instancia se encuentre dentro de los limites
             reg_peces.remove(self) # Elimina la instancia del registro
+        if self.muerto:
+            reg_peces.remove(self) # Elimina la instancia del registro
+            estado_anzuelo = 1
 
     def movimiento(self): # Metodo para mover la imagen
-        self.rectangulo.left += 2*self.velocidad # Aumenta o reduce la pocision en X dependiento de la velocidad
-        
-Crear_pez(0)
-Crear_pez(1)
-Crear_pez(0)
+        global rectangulo_anzuelo, puntos
+        if self.atrapado:
+            self.rectangulo.top = rectangulo_anzuelo.top # actualiza la posicion del rectangulo a la posicion en Y del mouse
+            self.rectangulo.left = rectangulo_anzuelo.left # actualiza la posicion del rectangulo a la posicion en X del mouse
+        else:
+            self.rectangulo.left += 2*self.velocidad # Aumenta o reduce la pocision en X dependiento de la velocidad
+
 
 #--------Ciclo de actuializacion de pantalla de inicio-------------------------------------------------
 while pantalla == 1:
@@ -171,9 +184,9 @@ anz = Anzuelo()
 
 
 #---------Musica de fondo-----------------------------------------------------------------------------
-pygame.mixer.music.load("sounds/background_music.wav") # carga la musica de fondo
-pygame.mixer.music.set_volume(0.6) # cambiamos el volumen
-pygame.mixer.music.play(5) # reproduce la cancion
+#pygame.mixer.music.load("sounds/background_music.wav") # carga la musica de fondo
+#pygame.mixer.music.set_volume(0.6) # cambiamos el volumen
+#pygame.mixer.music.play(5) # reproduce la cancion
 
 
 #-------- Ciclo de actualizacion de pantalla de juego----------------------------------------------------
@@ -187,9 +200,9 @@ while pantalla == 2:
     screen.fill(color) # Rellena el fondo
     #--Las imagenes van despues de esta linea------------------------------
 
-    Generar_peces()
-
     screen.blit(img_fondo_mar, (0, 0)) # Mostrar fondo "mar"
+
+    Generar_peces() # Se generan los peces
 
     muestra_texto(str(puntos), 48, 360, 20) # Muestra el texto de la puntuacion
 
