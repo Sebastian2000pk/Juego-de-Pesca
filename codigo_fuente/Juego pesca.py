@@ -11,8 +11,7 @@ puntos = 0 # numero de puntos
 estado_anzuelo = 1 # estados del anzuelo (0:sin carnada, 1:con carnada, 2:con pez)
 start_time_ticks = pygame.time.get_ticks() # tiempo de inicio del contador para la generacion de peces
 last_time_ticks = start_time_ticks # tiempo requerido inicial para generar peces es de 0 seg
-
-
+num_carnadas = 3 # cantidad de carnadas en el juego
 
 #---Funciones-------------------------------------------------------------------------------------
 def Reproducir_musica(ruta, vol, num):
@@ -88,7 +87,7 @@ class Peces:
         self.x = -55 # Posicion X inicial
         self.tipo = t # Tipo de pez, sirve para usarlo dentro de la variable que almacena las imagenes de los peces
         self.velocidad = 1 # Velocidad de desplazamiento
-        self.y = randrange(100, 440) # Definir pocision aleatoria del eje Y
+        self.y = randrange(120, 440) # Definir pocision aleatoria del eje Y
         self.pos_x = randrange(0,2)
         if self.pos_x == 1:
             self.x = 700
@@ -98,7 +97,7 @@ class Peces:
         self.rectangulo.top = self.y
         
     def mos(self, imagenes_peces, screen, rectangulo_anzuelo): # Metodo para mostrar la imagen
-        global estado_anzuelo, puntos
+        global estado_anzuelo, puntos, num_carnadas
         img = imagenes_peces[self.tipo] # Guarda la imagen del pes
         if self.velocidad > 0:
             img = pygame.transform.flip(img, True, False) # Si avanza a la derecha, le da la vuelta a la imagen
@@ -110,9 +109,11 @@ class Peces:
         screen.blit(img, self.rectangulo) # Mostrar imagen del pez
         if self.rectangulo.top < 70 and estado_anzuelo == 0:
             self.muerto = True # el objeto debe eliminarse
-        if self.rectangulo.colliderect(rectangulo_anzuelo) and estado_anzuelo == 1: # verifica si esta colisonando con el anzuelo y si el anzuelo tiene carnada
+            puntos += 1 # suma la cantidad de puntos globales
+        if self.rectangulo.colliderect(rectangulo_anzuelo) and estado_anzuelo == 1 and num_carnadas != 0: # verifica si esta colisonando con el anzuelo y si el anzuelo tiene carnada
             estado_anzuelo = 0 # cambia el estado del anzuelo a uno sin caranda
-            puntos += 1 # suma la cantidad de puntos
+            #puntos += 1 # suma la cantidad de puntos
+            num_carnadas -= 1 # resta un en el numero de carnadas
             #reg_peces.remove(self) # Elimina la instancia del registro
             self.atrapado = True
         
@@ -159,8 +160,9 @@ def Main():
     imagenes_peces[1] = pygame.transform.scale(imagenes_peces[1], (67, 51)) # Escalar la imagen pez morado
     img_anzuelo = [pygame.image.load("images/canna.png"), pygame.image.load("images/canna_carnada.png")] # Carga imagen de anzuelo vacio (0) y con carnada (1)
     rectangulo_anzuelo = img_anzuelo[0].get_rect() # obtiene el rectangulo del anzuelo
+    img_contador_carnadas = pygame.image.load("images/contador_carnada.png") # Carga imagen del contador de las carnadas
 
-    # -----------------------Iniciar las ventanas--------------------------
+    # -----------------------Iniciar las ventanas-------------------------------------------------------------------------------------
     screen = pygame.display.set_mode(size) # Iniciar la ventana
     pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 
@@ -186,7 +188,7 @@ def Main():
 
     Reproducir_musica("sounds/background_music.wav", 0.6, 1) # Musica de fondo
 
-    #-------- Ciclo de actualizacion de pantalla de juego----------------------------------------------------
+    #-------- Ciclo de actualizacion de pantalla de juego---------------------------------------------------------------------------------
     while pantalla == 2:
         reloj.tick(fps) # Velocidad a la que corre el juego
         pygame.mouse.set_visible(0) # Desaparece el puntero
@@ -197,7 +199,11 @@ def Main():
         screen.fill(color) # Rellena el fondo
         #--Las imagenes van despues de esta linea------------------------------
 
+
         screen.blit(img_fondo_mar, (0, 0)) # Mostrar fondo "mar"
+
+        screen.blit(img_contador_carnadas, (5, 5)) # Mostrar el contador de las carnadas
+        muestra_texto("x " + str(num_carnadas), 26, 60, 30, screen, fuente) # Mostrar el numero de carnadas
 
         Generar_peces(frecuencia, imagenes_peces) # Se generan los peces
 
@@ -212,8 +218,35 @@ def Main():
         
         anz.mostrar(rectangulo_anzuelo, img_anzuelo, screen, estado_anzuelo) # muestra el anzuelo en la pantalla
 
+        if num_carnadas == 0: # verifica si no hay carnadas
+            pygame.mixer.music.stop() # detiene la musica de fondo
+            pantalla = 3 # cambio a la pantalla de las estadisticas de la partida
+
 
         #--Las imagenes van antes de esta linea---------------------------------
         pygame.display.update() # Actualiza la imagen de la ventana
+    
+
+
+
+    #-------- Ciclo de actualizacion de pantalla de juego---------------------------------------------------------------------------------
+    while pantalla == 3:
+        reloj.tick(fps) # Velocidad a la que corre el juego
+        pygame.mouse.set_visible(1) # Desaparece el puntero
+
+        for event in pygame.event.get(): # Detecta los eventos
+            if event.type == pygame.QUIT: sys.exit() # Si el evento fue presionar la X, se cierra el programa
+
+        screen.fill(color) # Rellena el fondo
+        #--Las imagenes van despues de esta linea------------------------------
+
+
+        muestra_texto(str(puntos), 65, 340, 220, screen, fuente) # Muestra la cantidad de puntos oobtenidos
+
+
+        #--Las imagenes van antes de esta linea---------------------------------
+        pygame.display.update() # Actualiza la imagen de la ventana
+
+
 
 Main() # Llamar a la funcion principal
