@@ -14,6 +14,7 @@
   - [x] Requests==2.25.0
   - [x] pygame==2.0.0dev18
   - [x] tkinter==8.6
+  - [x] pyttsx3==1.17
 
 ### 3. Ejecutar en cmd los siguientes comandos para instalar la librería :computer: :
 ```
@@ -21,4 +22,5 @@
      pip install requests
      pip install beautifulsup4
      pip install tkinter
+     pip install pyttsx3
 ```
