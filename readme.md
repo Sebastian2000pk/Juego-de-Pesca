@@ -33,3 +33,11 @@
 ![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Login2.PNG)   
 ### ~Evidencia de Registro:
 ![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Login3.PNG)   
+### ~Evidencia de Lobby:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/fondologin.PNG)   
+### ~Evidencia de Instrucciones:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Instrucciones.PNG)   
+### ~Evidencia de Juego:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/InGame.PNG)   
+### ~Evidencia de Juego en pausa:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Pausa.PNG)   
