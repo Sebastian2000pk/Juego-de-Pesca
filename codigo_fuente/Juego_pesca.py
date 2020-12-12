@@ -1,4 +1,4 @@
-import pygame, sys, os, botones
+import pygame, sys, os, botones, Login
 from random import randrange, choice
 pygame.init()
 
@@ -15,7 +15,8 @@ start_time_ticks = pygame.time.get_ticks() # tiempo de inicio del contador para 
 last_time_ticks = start_time_ticks # tiempo requerido inicial para generar peces es de 0 seg
 start_time_ticks_caja = pygame.time.get_ticks() # tiempo de inicio del contador para la generacion de cajas
 last_time_ticks_caja = start_time_ticks # tiempo requerido inicial para generar las cajas es de 0 seg
-num_carnadas = 3 # cantidad de carnadas en el juego
+num_carnadas = 3 # cantidad de carnadas en el juego}
+usuario = ''
 
 
 #-------------------------------------------------------------------------------------------------
@@ -67,6 +68,24 @@ def Crear_boton_jugar(x, y, screen, img_boton_jugar, eventos): # Funcion que cre
     else:
         return False
 
+def Buscar_usuario(nombre):
+    global posicion_usuario
+    file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
+    lineas_separadas = file.readlines()
+    file.close()
+    datos_usuario = []
+    contador = 0
+    for linea in lineas_separadas:
+        linea = linea.replace('\n', '')
+        linea = linea.split(':')
+        if linea[0] == nombre:
+            datos_usuario = linea
+            posicion_usuario = contador
+            break
+        contador += 1
+    return datos_usuario
+        
+
 def Crear_pez(t, imagenes_peces): # Funcion para crear los peces
     global reg_peces
     p = Peces(t, len(reg_peces), imagenes_peces) # crea la instancia del objeto pez
@@ -77,7 +96,33 @@ def Crear_caja(imagen_caja): # Funcion para crear las cajas de carnada
     global reg_peces
     caja = Caja_carnada(imagen_caja) # Crea una instancia de la caja de carnadas
     reg_cajas.append(caja) # Almacena la instancia de la caja en el registro
-    
+
+def Agregar_puntaje(puntos):
+    global posicion_usuario
+    if puntos > int(datos_usuario[2]):
+        file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
+        lineas_separadas = file.readlines()
+        file.close()
+        datos = []
+
+        for linea in lineas_separadas:
+            linea = linea.replace('\n', '')
+            linea = linea.split(':')
+            datos.append(linea)
+        
+        datos[posicion_usuario][2] = str(puntos)
+
+        Escribir_datos(datos)
+        
+def Escribir_datos(datos):
+    file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'w')
+    texto = ""
+    for linea in datos:
+        texto += linea[0]+':'+linea[1]+':'+linea[2]+'\n'
+    file.write(texto)
+    file.close()
+
+
 def Resetear():
     global reg_cajas, reg_peces, puntos, estado_anzuelo, start_time_ticks, last_time_ticks,start_time_ticks_caja,last_time_ticks_caja, num_carnadas
 
@@ -103,7 +148,9 @@ def Pantalla(numero_pantalla, screen):
 
 #-- Pantalla 1 -------------------------------
 def Escena1(configuracion, screen):
+    global nombre, datos_usuario
     # Variables ------------
+    datos_usuario = Buscar_usuario(nombre)
     pygame.mouse.set_visible(True)
     continuar = True
     # Cargar imagenes varias -----
@@ -121,6 +168,8 @@ def Escena1(configuracion, screen):
         screen.fill(configuracion.get('color')) # Rellena el fondo
         #--Las imagenes van despues de esta linea
 
+        muestra_texto("maximo puntaje: "+str(datos_usuario[2]), 26, 370, 300, screen, pygame.font.match_font('arial'))
+        muestra_texto(str(datos_usuario[0]), 26, 50, 10, screen, pygame.font.match_font('arial'))
 
         precionado = Crear_boton_jugar(220, 150, screen, img_boton_jugar, evento)
         if precionado:
@@ -140,7 +189,7 @@ def Escena2(configuracion, screen):
     siguiente = 0
 
     #Cargar Imagenes varias
-    img_fondo_mar = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo mar.jpg")) # Fondo del mar
+    img_fondo_mar = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo mar.png")) # Fondo del mar
     img_fondo_mar = pygame.transform.scale(img_fondo_mar, (720, 480))
     img_anzuelo = [pygame.image.load(os.path.abspath("./codigo_fuente/images/canna.png")), 
     pygame.image.load(os.path.abspath("./codigo_fuente/images/canna_carnada.png"))] # Carga imagen de anzuelo vacio (0) y con carnada (1)
@@ -217,6 +266,7 @@ def Escena2(configuracion, screen):
             pygame.mixer.music.stop() # detiene la musica de fondo
             continuar = False
             siguiente = 3
+            Agregar_puntaje(puntos)
 
         #--Las imagenes van antes de esta linea---------------------------------
         pygame.display.update() # Actualiza la imagen de la ventana
@@ -422,13 +472,21 @@ def Main():
 
     # ------------------------- Variables -------------------------------
     siguiente = 1
+    juego = True
+    global datos_usuario, posicion_usuario, nombre
 
+    # ----------------------- Login --------------------------------------
+    nombre = Login.pantalla_principal()
+    datos_usuario = Buscar_usuario(nombre)
+    
     # -----------------------Iniciar las ventanas-------------------------------------------------------------------------------------
     screen = pygame.display.set_mode(size) # Iniciar la ventana
     pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 
-    while True:
+    while juego:
         siguiente = Pantalla(siguiente, screen) # pantalla principal
+        if siguiente == -1:
+            juego = False
 
 
 Main() # Llamar a la funcion principal

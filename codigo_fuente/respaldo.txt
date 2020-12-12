@@ -1,5 +1,3 @@
-admin:password
-pepito:perez
-:perez
-asdasd:
-sadsad:asdasda
+oso:123:2
+sls:123:2
+::0

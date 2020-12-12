@@ -3,7 +3,8 @@ import os
 
 def Acceso_aceptado():
 	#Aqui va la pantalla del juego de pygame
-	print('working...')
+    pantalla.destroy()
+    
 
 def contrasenya_no_reconocida():
 	global pantalla4
@@ -12,7 +13,7 @@ def contrasenya_no_reconocida():
 	pantalla4.geometry('300x250')
 
 	global emergente
-	emergente = PhotoImage(file = 'quien.png')
+	emergente = PhotoImage(file = os.path.abspath("./codigo_fuente/images/quien.png"))
 	mi_frame = Frame(pantalla4)
 	mi_frame.pack()
 	Label(mi_frame, image = emergente).pack()	
@@ -50,14 +51,14 @@ def usuario_existente():
 	Label(pantalla6, text = 'Yo te conozco\n—> Este usuario ya existe <—').pack()
 	Button(pantalla6, text = 'OK', command = pantalla6.destroy).pack()	
 
-def register_user():
+def registrar_usuario():
 	nombre_usuario_info = nombre_usuario.get()
 	contrasenya_info = contrasenya.get()
 
 	file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'a')
 	if nombre_usuario_info not in usuarios.keys() and contrasenya_info != ' ' and nombre_usuario_info != ' nombre_usuario_info' :
 		usuarios[nombre_usuario_info] = contrasenya_info
-		file.write(nombre_usuario_info+':'+contrasenya_info)
+		file.write(nombre_usuario_info+':'+contrasenya_info+':'+'0')
 		file.write('\n')
 		file.close()
 		Label(pantalla1, text = 'Bienvenido a la familia\n—> Registrado exitosamente <—', fg = 'green', font = ('calibri', 11)).pack()
@@ -67,7 +68,7 @@ def register_user():
 	nombre_usuario_llave.delete(0, END)
 	contrasenya_llave.delete(0, END)
 
-def register():
+def registro():
 	global pantalla1
 
 	pantalla1 = Toplevel(pantalla)
@@ -92,10 +93,10 @@ def register():
 	contrasenya_llave = Entry(pantalla1, textvariable = contrasenya)
 	contrasenya_llave.pack()
 	Label(pantalla1, text = '').pack()
-	Button(pantalla1, text = 'Registrarse', width = 10, height =1, command = register_user).pack()
+	Button(pantalla1, text = 'Registrarse', width = 10, height =1, command = registrar_usuario).pack()
 
 def verificar_ingreso():
-
+	global nombre_usuario1
 	nombre_usuario1 = nombre_usuario_llave.get()
 	contrasenya1 = contrasenya_llave.get()
 	nombre_usuario_entrada1.delete(0, END)
@@ -105,8 +106,8 @@ def verificar_ingreso():
 	
 	if nombre_usuario1 in usuarios:
 		file1 = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
-		print(contrasenya1)
-		print(usuarios[nombre_usuario1])
+		#print(contrasenya1)
+		#print(usuarios[nombre_usuario1])
 		if contrasenya1 == usuarios[nombre_usuario1]:
 			Acceso_aceptado()
 		else:
@@ -171,13 +172,14 @@ def actualizar():
 
 	file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
 	lineas_separadas = file.readlines()
-	print(lineas_separadas)
+	file.close()
+	#print(lineas_separadas)
 
 	for linea in lineas_separadas:
 		linea = linea.replace('\n', '')
 		linea = linea.split(':')			
 		usuarios[linea[0]] = linea[1]
-		print(linea)
+		#print(linea)
 
 def pantalla_principal():
 	global pantalla
@@ -193,6 +195,8 @@ def pantalla_principal():
 	icono = PhotoImage(file = os.path.abspath("./codigo_fuente/images/iconologin.png"))
 	Label(image = icono).pack()
 	Button(text = 'Ingresar', height = '2', width = '30', command = Ingreso).pack()
-	Button(text = 'Registrarse', height = '2', width = '30', command = register).pack()
+	Button(text = 'Registrarse', height = '2', width = '30', command = registro).pack()
 
 	pantalla.mainloop()
+
+	return nombre_usuario1
