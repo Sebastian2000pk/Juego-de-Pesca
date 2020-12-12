@@ -1,4 +1,4 @@
-import pygame, sys, os, botones, Login, webscraping
+import pygame, sys, os, botones, Login, webscraping, pyttsx3
 from random import randrange, choice
 pygame.init()
 
@@ -17,6 +17,7 @@ start_time_ticks_caja = pygame.time.get_ticks() # tiempo de inicio del contador 
 last_time_ticks_caja = start_time_ticks # tiempo requerido inicial para generar las cajas es de 0 seg
 num_carnadas = 3 # cantidad de carnadas en el juego}
 usuario = ''
+puntos2 = 0
 
 
 #-------------------------------------------------------------------------------------------------
@@ -122,6 +123,10 @@ def Escribir_datos(datos):
     file.write(texto)
     file.close()
 
+def Cortar_texto(text):
+    texto = text.split()
+    
+    return texto
 
 def Resetear():
     global reg_cajas, reg_peces, puntos, estado_anzuelo, start_time_ticks, last_time_ticks,start_time_ticks_caja,last_time_ticks_caja, num_carnadas
@@ -150,38 +155,67 @@ def Pantalla(numero_pantalla, screen):
 def Escena1(configuracion, screen):
     global nombre, datos_usuario
     # Variables ------------
+    frase_ya = webscraping.imprimir()
+    frase_ya = frase_ya.replace("\n", "")
+    #frase_ya = Cortar_texto(frase_ya)
+    reproducir = True
+    a = 0
+
     datos_usuario = Buscar_usuario(nombre)
     pygame.mouse.set_visible(True)
     continuar = True
     # Cargar imagenes varias -----
+    img_fondo = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondolobby.png"))
     img_boton_jugar = pygame.image.load(os.path.abspath("./codigo_fuente/images/boton_jugar.png")) # Boton jugar
     img_boton_jugar = pygame.transform.scale(img_boton_jugar, (285, 125))
+    img_tutorial = pygame.image.load(os.path.abspath("./codigo_fuente/images/instrucciones.png"))
     evento = None
+    boton_info = botones.Iniciar_boton(4, 650, 10)
+    boton_continuar = botones.Iniciar_boton(5, 580, 400)
     # Ciclo del juego -----
     while continuar:
-        configuracion.get('reloj').tick(configuracion.get('fps')) # Velocidad a la que corre el juego
-
         for eventos in pygame.event.get(): # Detecta los eventos
             if eventos.type == pygame.QUIT: sys.exit() # Si el evento fue presionar la X, se cierra el programa
             evento = eventos
+        if a == 4:
+            screen.blit(img_tutorial, (10, 0))
+            b = boton_continuar.Actualizar(screen, evento, 0)
+            if b == 5:
+                a = 0
+        else:
+            configuracion.get('reloj').tick(configuracion.get('fps')) # Velocidad a la que corre el juego
 
-        screen.fill(configuracion.get('color')) # Rellena el fondo
-        #--Las imagenes van despues de esta linea
 
-        muestra_texto("maximo puntaje: "+str(datos_usuario[2]), 26, 370, 300, screen, pygame.font.match_font('arial'))
-        muestra_texto(str(datos_usuario[0]), 26, 50, 10, screen, pygame.font.match_font('arial'))
 
-        precionado = Crear_boton_jugar(220, 150, screen, img_boton_jugar, evento)
-        if precionado:
-            continuar = False
-            #Pantalla(2, screen) # Cambia de pantalla a pantalla de juego
+            screen.blit(img_fondo, (0, 0))
+            #screen.fill(configuracion.get('color')) # Rellena el fondo
+            #--Las imagenes van despues de esta linea
 
-        #--Las imagenes van antes de esta linea
-        pygame.display.update() # Actualiza la imagen de la ventana
+            a = boton_info.Actualizar(screen, evento, 0)
+
+            muestra_texto("maximo puntaje: "+str(datos_usuario[2]), 26, 370, 50, screen, pygame.font.match_font('arial'))
+            muestra_texto(str(datos_usuario[0]), 26, 50, 10, screen, pygame.font.match_font('arial'))
+            #muestra_texto(frase_ya, 18, 360, 300, screen, pygame.font.match_font('arial'))
+
+            precionado = Crear_boton_jugar(220, 150, screen, img_boton_jugar, evento)
+            if precionado:
+                continuar = False
+                #Pantalla(2, screen) # Cambia de pantalla a pantalla de juego
+
+
+            #--Las imagenes van antes de esta linea
+            if reproducir:
+                pygame.display.update() # Actualiza la imagen de la ventana
+                locutor = pyttsx3.init()
+                locutor.say(frase_ya)
+                locutor.runAndWait()
+                reproducir = False
+        pygame.display.update()
     return 2
 
 #-- Pantalla 2--#
 def Escena2(configuracion, screen):
+    global puntos2
     # -------------------------Variables de configuracion-----------------
     frecuencia_cajas = 15 # Frecuencia de aparicion de las cajas de carnadas
     continuar = True
@@ -266,6 +300,7 @@ def Escena2(configuracion, screen):
             pygame.mixer.music.stop() # detiene la musica de fondo
             continuar = False
             siguiente = 3
+            puntos2 = puntos
             Agregar_puntaje(puntos)
 
         #--Las imagenes van antes de esta linea---------------------------------
@@ -275,7 +310,7 @@ def Escena2(configuracion, screen):
 
 #-- Pantalla 2--#
 def Escena3(configuracion, screen):
-    global puntos
+    global puntos2
 
     # Cargar imagenes ---
     img_fondo_playa = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo_playa.png"))
@@ -310,7 +345,7 @@ def Escena3(configuracion, screen):
 
         if siguiente != 0:
             continuar = False
-        muestra_texto(str(puntos), 65, 340, 220, screen, pygame.font.match_font('arial')) # Muestra la cantidad de puntos oobtenidos
+        muestra_texto(str(puntos2), 65, 340, 220, screen, pygame.font.match_font('arial')) # Muestra la cantidad de puntos oobtenidos
 
 
         #--Las imagenes van antes de esta linea---------------------------------
@@ -474,13 +509,12 @@ def Main():
     siguiente = 1
     juego = True
     global datos_usuario, posicion_usuario, nombre
-
+    frase = webscraping.main()
     # ----------------------- Login --------------------------------------
     nombre = Login.pantalla_principal()
     datos_usuario = Buscar_usuario(nombre)
     
-    # ---------------------- web scraping ------------------------------
-    webscraping.main()
+
 
     # -----------------------Iniciar las ventanas-------------------------------------------------------------------------------------
     screen = pygame.display.set_mode(size) # Iniciar la ventana

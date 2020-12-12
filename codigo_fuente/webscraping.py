@@ -5,8 +5,8 @@ import random
 def imprimir():
     file = open("frases_inicio.txt","r")
     lista_datos = file.readlines()
-    posicion = random.randint(0,25)
-    print(lista_datos[posicion])
+    posicion = random.randint(0,24)
+    return lista_datos[posicion]
 
 def manitas_a_la_obra(texto_limpio):
     f = open("frases_inicio.txt","w") #w: write
@@ -28,4 +28,3 @@ def main():
     soup = BeautifulSoup(html, "html.parser")
     texto = soup.get_text()
     fraccionar(texto)
-    imprimir()
