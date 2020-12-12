@@ -1,0 +1,6 @@
+python==3.7.9
+BeautifulSoup==3.2.2
+Requests==2.25.0
+pygame==2.0.0dev18
+tkinter==8.6
+pyttsx3==2.90
