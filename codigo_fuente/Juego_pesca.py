@@ -1,4 +1,4 @@
-import pygame, sys, os, botones, Login
+import pygame, sys, os, botones, Login, webscraping
 from random import randrange, choice
 pygame.init()
 
@@ -479,6 +479,9 @@ def Main():
     nombre = Login.pantalla_principal()
     datos_usuario = Buscar_usuario(nombre)
     
+    # ---------------------- web scraping ------------------------------
+    webscraping.main()
+
     # -----------------------Iniciar las ventanas-------------------------------------------------------------------------------------
     screen = pygame.display.set_mode(size) # Iniciar la ventana
     pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
