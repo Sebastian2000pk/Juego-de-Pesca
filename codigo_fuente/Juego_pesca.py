@@ -1,4 +1,4 @@
-import pygame, sys, os
+import pygame, sys, os, botones
 from random import randrange, choice
 pygame.init()
 
@@ -57,10 +57,13 @@ def Crear_boton_jugar(x, y, screen, img_boton_jugar, eventos): # Funcion que cre
     pos1 = x + 30, y + 30 # Posicion 1 del area de colision
     pos2 = x + ancho - 30, y + alto - 30 # Posicion 2 del area de colision
     mouse_pos = pygame.mouse.get_pos()
-    if eventos.type == pygame.QUIT:
-        exit()
-    if eventos.type == pygame.MOUSEBUTTONDOWN and eventos.button == 1 and pos1[0] < mouse_pos[0] < pos2[0] and pos1[1] < mouse_pos[1] < pos2[1]: # Verifica si se esta precionando el mouse y si esta desntro del area del boton
-        return True
+    if eventos != None:
+        if eventos.type == pygame.QUIT:
+            exit()
+        if eventos.type == pygame.MOUSEBUTTONDOWN and eventos.button == 1 and pos1[0] < mouse_pos[0] < pos2[0] and pos1[1] < mouse_pos[1] < pos2[1]: # Verifica si se esta precionando el mouse y si esta desntro del area del boton
+            return True
+        else:
+            return False
     else:
         return False
 
@@ -75,39 +78,58 @@ def Crear_caja(imagen_caja): # Funcion para crear las cajas de carnada
     caja = Caja_carnada(imagen_caja) # Crea una instancia de la caja de carnadas
     reg_cajas.append(caja) # Almacena la instancia de la caja en el registro
     
+def Resetear():
+    global reg_cajas, reg_peces, puntos, estado_anzuelo, start_time_ticks, last_time_ticks,start_time_ticks_caja,last_time_ticks_caja, num_carnadas
+
+    reg_cajas = [] # Almacena las intancias de las cajas de carnada
+    reg_peces = [] # Almacena las instancias de los peces
+    puntos = 0 # numero de puntos
+    estado_anzuelo = 1 # estados del anzuelo (0:sin carnada, 1:con carnada, 2:con pez)
+    start_time_ticks = pygame.time.get_ticks() # tiempo de inicio del contador para la generacion de peces
+    last_time_ticks = start_time_ticks # tiempo requerido inicial para generar peces es de 0 seg
+    start_time_ticks_caja = pygame.time.get_ticks() # tiempo de inicio del contador para la generacion de cajas
+    last_time_ticks_caja = start_time_ticks # tiempo requerido inicial para generar las cajas es de 0 seg
+    num_carnadas = 3 # cantidad de carnadas en el juego
+
 #-- Escoger pantalla -------------------------
 def Pantalla(numero_pantalla, screen):
     configuracion_pantalla = {'reloj': pygame.time.Clock(), 'fps': 30, 'color': (255, 255, 255)}
     if numero_pantalla == 1:
-        Escena1(configuracion_pantalla, screen)
+        return Escena1(configuracion_pantalla, screen)
     if numero_pantalla == 2:
-        Escena2(configuracion_pantalla, screen)
+        return Escena2(configuracion_pantalla, screen)
     if numero_pantalla == 3:
-        Escena3(configuracion_pantalla, screen)
+        return Escena3(configuracion_pantalla, screen)
 
 #-- Pantalla 1 -------------------------------
 def Escena1(configuracion, screen):
+    # Variables ------------
+    pygame.mouse.set_visible(True)
     continuar = True
     # Cargar imagenes varias -----
     img_boton_jugar = pygame.image.load(os.path.abspath("./codigo_fuente/images/boton_jugar.png")) # Boton jugar
     img_boton_jugar = pygame.transform.scale(img_boton_jugar, (285, 125))
+    evento = None
     # Ciclo del juego -----
     while continuar:
         configuracion.get('reloj').tick(configuracion.get('fps')) # Velocidad a la que corre el juego
 
         for eventos in pygame.event.get(): # Detecta los eventos
             if eventos.type == pygame.QUIT: sys.exit() # Si el evento fue presionar la X, se cierra el programa
+            evento = eventos
 
         screen.fill(configuracion.get('color')) # Rellena el fondo
         #--Las imagenes van despues de esta linea
 
-        precionado = Crear_boton_jugar(220, 150, screen, img_boton_jugar, eventos)
+
+        precionado = Crear_boton_jugar(220, 150, screen, img_boton_jugar, evento)
         if precionado:
             continuar = False
-            Pantalla(2, screen) # Cambia de pantalla a pantalla de juego
+            #Pantalla(2, screen) # Cambia de pantalla a pantalla de juego
 
         #--Las imagenes van antes de esta linea
         pygame.display.update() # Actualiza la imagen de la ventana
+    return 2
 
 #-- Pantalla 2--#
 def Escena2(configuracion, screen):
@@ -115,6 +137,7 @@ def Escena2(configuracion, screen):
     frecuencia_cajas = 15 # Frecuencia de aparicion de las cajas de carnadas
     continuar = True
     frecuencia = 4 # frecuencia de generacion de los peces en segundos
+    siguiente = 0
 
     #Cargar Imagenes varias
     img_fondo_mar = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo mar.jpg")) # Fondo del mar
@@ -139,6 +162,10 @@ def Escena2(configuracion, screen):
     imagenes_peces[4] = pygame.transform.scale(imagenes_peces[4], (58, 42)) # Escalar la imagen pez globo
     imagenes_peces[5] = pygame.transform.scale(imagenes_peces[5], (339, 184)) # Escalar la imagen del tiburon
     
+    # Botones
+    
+    #boton_musica = botones.Iniciar_boton(0, 670, 10)
+
     Reproducir_musica(os.path.abspath("./codigo_fuente/sounds/background_music.wav"), 0.6, 3) # Musica de fondo
     anz = Anzuelo(rectangulo_anzuelo, img_anzuelo) # Crea una instancia del anzuelo
 
@@ -149,12 +176,17 @@ def Escena2(configuracion, screen):
 
         for event in pygame.event.get(): # Detecta los eventos
             if event.type == pygame.QUIT: sys.exit() # Si el evento fue presionar la X, se cierra el programa
-
+            if event.type == 768:
+                continuar = False
+                siguiente = 1
+                pygame.mixer.music.stop()
         screen.fill(configuracion.get('color')) # Rellena el fondo
         #--Las imagenes van despues de esta linea------------------------------
 
 
         screen.blit(img_fondo_mar, (0, 0)) # Mostrar fondo "mar"
+
+        #boton_musica.Mostrar(screen)
 
         screen.blit(img_contador_carnadas, (5, 5)) # Mostrar el contador de las carnadas
         muestra_texto("x " + str(num_carnadas), 26, 60, 30, screen, pygame.font.match_font('arial')) # Mostrar el numero de carnadas
@@ -184,35 +216,64 @@ def Escena2(configuracion, screen):
         if num_carnadas == 0: # verifica si no hay carnadas
             pygame.mixer.music.stop() # detiene la musica de fondo
             continuar = False
-            Pantalla(3, screen) # cambio a la pantalla de las estadisticas de la partida
-
+            siguiente = 3
 
         #--Las imagenes van antes de esta linea---------------------------------
         pygame.display.update() # Actualiza la imagen de la ventana
+    Resetear()
+    return siguiente
 
 #-- Pantalla 2--#
 def Escena3(configuracion, screen):
     global puntos
+
+    # Cargar imagenes ---
+    img_fondo_playa = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo_playa.png"))
+
+    # botones----
+    boton_casa = botones.Iniciar_boton(1, 250, 310)
+    boton_otravez = botones.Iniciar_boton(2, 320, 310)
+
     continuar = True
+    siguiente = 0
+    evento = None
     while continuar:
+
+        # ------- Variables --------
+
         configuracion.get('reloj').tick(configuracion.get('fps')) # Velocidad a la que corre el juego
         pygame.mouse.set_visible(1) # Desaparece el puntero
 
         for event in pygame.event.get(): # Detecta los eventos
             if event.type == pygame.QUIT: sys.exit() # Si el evento fue presionar la X, se cierra el programa
+            evento = event
 
         screen.fill(configuracion.get('color')) # Rellena el fondo
         #--Las imagenes van despues de esta linea------------------------------
 
+        screen.blit(img_fondo_playa, (0, 0)) # Mostrar fondo "mar"
 
+        # botones
+        siguiente = boton_casa.Actualizar(screen, evento, siguiente)
+        siguiente = boton_otravez.Actualizar(screen, evento, siguiente)        
+
+
+        if siguiente != 0:
+            continuar = False
         muestra_texto(str(puntos), 65, 340, 220, screen, pygame.font.match_font('arial')) # Muestra la cantidad de puntos oobtenidos
 
 
         #--Las imagenes van antes de esta linea---------------------------------
         pygame.display.update() # Actualiza la imagen de la ventana
 
+    return siguiente
 
-#---Clases-------------------------------------------------------------------------------------------
+
+
+#-------------------------------------------------------------------------------------------------
+#------------- Clases ----------------------------------------------------------------------------
+#-------------------------------------------------------------------------------------------------
+
 class Anzuelo:
     def __init__(self, rectangulo_anzuelo, img_anzuelo):
         self.conCarnada = 1 # para saber cuando tiene o no carnada
@@ -358,12 +419,16 @@ def Main():
 
     # -------------------------Variables de configuracion-----------------
     size = (720, 480) # Tamaño de la ventana
-   
+
+    # ------------------------- Variables -------------------------------
+    siguiente = 1
+
     # -----------------------Iniciar las ventanas-------------------------------------------------------------------------------------
     screen = pygame.display.set_mode(size) # Iniciar la ventana
     pygame.display.set_caption("Juego de pesca") # Cambiar nombre de la ventana
 
-    Pantalla(1, screen) # pantalla principal
+    while True:
+        siguiente = Pantalla(siguiente, screen) # pantalla principal
 
 
 Main() # Llamar a la funcion principal
