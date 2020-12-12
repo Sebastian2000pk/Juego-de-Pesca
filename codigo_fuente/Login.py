@@ -161,7 +161,7 @@ def Ingreso():
 	nombre_usuario_entrada1.pack()
 	Label(pantalla2, text = '').pack()
 	Label(pantalla2, text = 'Contraseña * ').pack()
-	contrasenya_entrada1 = Entry(pantalla2, textvariable = contrasenya_llave)
+	contrasenya_entrada1 = Entry(pantalla2, textvariable = contrasenya_llave, show = '*')
 	contrasenya_entrada1.pack()
 	Label(pantalla2, text = '').pack()
 	Button(pantalla2, text = 'Ingresar', width = 10, height = 1, command = verificar_ingreso).pack()

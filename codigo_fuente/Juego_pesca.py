@@ -169,9 +169,11 @@ def Escena1(configuracion, screen):
     img_boton_jugar = pygame.image.load("images/boton_jugar.png") # Boton jugar
     img_boton_jugar = pygame.transform.scale(img_boton_jugar, (285, 125))
     img_tutorial = pygame.image.load("images/instrucciones.png")
+    img_scoreboard = pygame.image.load("images/scoreboard.png")
     evento = None
     boton_info = botones.Iniciar_boton(4, 650, 10)
     boton_continuar = botones.Iniciar_boton(5, 580, 400)
+    boton_score = botones.Iniciar_boton(3, 650, 90)
     # Ciclo del juego -----
     while continuar:
         for eventos in pygame.event.get(): # Detecta los eventos
@@ -182,6 +184,21 @@ def Escena1(configuracion, screen):
             b = boton_continuar.Actualizar(screen, evento, 0)
             if b == 5:
                 a = 0
+        elif a == 3 and nombre == 'admin': 
+            screen.blit(img_scoreboard, (0, 0))
+            b = boton_continuar.Actualizar(screen, evento, 0)
+            if b == 5:
+                a = 0
+            file = open("respaldo.txt", 'r')
+            lineas_separadas = file.readlines()
+            file.close()
+            posy = 50
+            for usua in lineas_separadas:
+                usua = usua.replace("\n", "")
+                usua = usua.split(':')
+                muestra_texto(usua[0]+"  -->  "+usua[2], 28, 360, posy, screen, pygame.font.match_font('arial'))
+                posy += 60
+
         else:
             configuracion.get('reloj').tick(configuracion.get('fps')) # Velocidad a la que corre el juego
 
@@ -192,6 +209,7 @@ def Escena1(configuracion, screen):
             #--Las imagenes van despues de esta linea
 
             a = boton_info.Actualizar(screen, evento, 0)
+            a = boton_score.Actualizar(screen, evento, a)
 
             muestra_texto("maximo puntaje: "+str(datos_usuario[2]), 26, 370, 50, screen, pygame.font.match_font('arial'))
             muestra_texto(str(datos_usuario[0]), 26, 50, 10, screen, pygame.font.match_font('arial'))
