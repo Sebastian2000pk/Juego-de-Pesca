@@ -2,7 +2,7 @@ import pygame, os
 
 
 def Iniciar_boton(tipo, x, y):
-    imagen = pygame.image.load(os.path.abspath("./codigo_fuente/images/botones/boton_"+str(tipo)+".png"))
+    imagen = pygame.image.load("images/botones/boton_"+str(tipo)+".png")
     imagen = pygame.transform.scale(imagen, (58, 58))
     return Botones(imagen, x, y, tipo)
 

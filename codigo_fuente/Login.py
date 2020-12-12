@@ -13,7 +13,7 @@ def contrasenya_no_reconocida():
 	pantalla4.geometry('300x250')
 
 	global emergente
-	emergente = PhotoImage(file = os.path.abspath("./codigo_fuente/images/quien.png"))
+	emergente = PhotoImage(file = "images/quien.png")
 	mi_frame = Frame(pantalla4)
 	mi_frame.pack()
 	Label(mi_frame, image = emergente).pack()	
@@ -28,7 +28,7 @@ def usuario_no_existente():
 	pantalla5.geometry('300x250')
 
 	global emergente
-	emergente = PhotoImage(file = os.path.abspath("./codigo_fuente/images/eresnuevo.png"))
+	emergente = PhotoImage(file = "images/eresnuevo.png")
 	mi_frame = Frame(pantalla5)
 	mi_frame.pack()
 	Label(mi_frame, image = emergente).pack()	
@@ -43,7 +43,7 @@ def usuario_existente():
 	pantalla6.geometry('300x250')
 
 	global emergente
-	emergente = PhotoImage(file = os.path.abspath("./codigo_fuente/images/yoteconozco.png"))
+	emergente = PhotoImage(file = "images/yoteconozco.png")
 	mi_frame = Frame(pantalla6)
 	mi_frame.pack()
 	Label(mi_frame, image = emergente).pack()	
@@ -55,7 +55,7 @@ def registrar_usuario():
 	nombre_usuario_info = nombre_usuario.get()
 	contrasenya_info = contrasenya.get()
 
-	file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'a')
+	file = open("respaldo.txt", 'a')
 	if nombre_usuario_info not in usuarios.keys() and contrasenya_info != ' ' and nombre_usuario_info != ' nombre_usuario_info' :
 		usuarios[nombre_usuario_info] = contrasenya_info
 		file.write(nombre_usuario_info+':'+contrasenya_info+':'+'0')
@@ -105,7 +105,7 @@ def verificar_ingreso():
 	actualizar()
 	
 	if nombre_usuario1 in usuarios:
-		file1 = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
+		file1 = open("respaldo.txt", 'r')
 		#print(contrasenya1)
 		#print(usuarios[nombre_usuario1])
 		if contrasenya1 == usuarios[nombre_usuario1]:
@@ -170,7 +170,7 @@ def actualizar():
 
 	global lineas_separadas
 
-	file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
+	file = open("respaldo.txt", 'r')
 	lineas_separadas = file.readlines()
 	file.close()
 	#print(lineas_separadas)
@@ -192,7 +192,7 @@ def pantalla_principal():
 	pantalla.title('Club de pesca')
 	Label(text = 'Club de pesca', bg = 'grey', width = '300', height = '2', font = ('Calibri', 13)). pack()
 	Label(text = '').pack()
-	icono = PhotoImage(file = os.path.abspath("./codigo_fuente/images/iconologin.png"))
+	icono = PhotoImage(file = "images/iconologin.png")
 	Label(image = icono).pack()
 	Button(text = 'Ingresar', height = '2', width = '30', command = Ingreso).pack()
 	Button(text = 'Registrarse', height = '2', width = '30', command = registro).pack()

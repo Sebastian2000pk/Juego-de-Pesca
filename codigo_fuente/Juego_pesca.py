@@ -71,7 +71,7 @@ def Crear_boton_jugar(x, y, screen, img_boton_jugar, eventos): # Funcion que cre
 
 def Buscar_usuario(nombre):
     global posicion_usuario
-    file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
+    file = open("respaldo.txt", 'r')
     lineas_separadas = file.readlines()
     file.close()
     datos_usuario = []
@@ -101,7 +101,7 @@ def Crear_caja(imagen_caja): # Funcion para crear las cajas de carnada
 def Agregar_puntaje(puntos):
     global posicion_usuario
     if puntos > int(datos_usuario[2]):
-        file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'r')
+        file = open("respaldo.txt", 'r')
         lineas_separadas = file.readlines()
         file.close()
         datos = []
@@ -116,7 +116,7 @@ def Agregar_puntaje(puntos):
         Escribir_datos(datos)
         
 def Escribir_datos(datos):
-    file = open(os.path.abspath("./codigo_fuente/respaldo.txt"), 'w')
+    file = open("respaldo.txt", 'w')
     texto = ""
     for linea in datos:
         texto += linea[0]+':'+linea[1]+':'+linea[2]+'\n'
@@ -165,10 +165,10 @@ def Escena1(configuracion, screen):
     pygame.mouse.set_visible(True)
     continuar = True
     # Cargar imagenes varias -----
-    img_fondo = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondolobby.png"))
-    img_boton_jugar = pygame.image.load(os.path.abspath("./codigo_fuente/images/boton_jugar.png")) # Boton jugar
+    img_fondo = pygame.image.load("images/fondolobby.png")
+    img_boton_jugar = pygame.image.load("images/boton_jugar.png") # Boton jugar
     img_boton_jugar = pygame.transform.scale(img_boton_jugar, (285, 125))
-    img_tutorial = pygame.image.load(os.path.abspath("./codigo_fuente/images/instrucciones.png"))
+    img_tutorial = pygame.image.load("images/instrucciones.png")
     evento = None
     boton_info = botones.Iniciar_boton(4, 650, 10)
     boton_continuar = botones.Iniciar_boton(5, 580, 400)
@@ -223,21 +223,21 @@ def Escena2(configuracion, screen):
     siguiente = 0
 
     #Cargar Imagenes varias
-    img_fondo_mar = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo mar.png")) # Fondo del mar
+    img_fondo_mar = pygame.image.load("images/fondo mar.png") # Fondo del mar
     img_fondo_mar = pygame.transform.scale(img_fondo_mar, (720, 480))
-    img_anzuelo = [pygame.image.load(os.path.abspath("./codigo_fuente/images/canna.png")), 
-    pygame.image.load(os.path.abspath("./codigo_fuente/images/canna_carnada.png"))] # Carga imagen de anzuelo vacio (0) y con carnada (1)
+    img_anzuelo = [pygame.image.load("images/canna.png"), 
+    pygame.image.load("images/canna_carnada.png")] # Carga imagen de anzuelo vacio (0) y con carnada (1)
     rectangulo_anzuelo = img_anzuelo[0].get_rect() # obtiene el rectangulo del anzuelo
-    img_contador_carnadas = pygame.image.load(os.path.abspath("./codigo_fuente/images/contador_carnada.png")) # Carga imagen del contador de las carnadas
-    img_caja_carnadas = pygame.image.load(os.path.abspath("./codigo_fuente/images/caja_carnadas.png")) # Carga la imagen de la caja de las carnadas
+    img_contador_carnadas = pygame.image.load("images/contador_carnada.png") # Carga imagen del contador de las carnadas
+    img_caja_carnadas = pygame.image.load("images/caja_carnadas.png") # Carga la imagen de la caja de las carnadas
     img_caja_carnadas = pygame.transform.scale(img_caja_carnadas , (50, 50)) # canbia el tamaño de la caja de carnadas
     # Cargar imagenes peces
-    imagenes_peces = [pygame.image.load(os.path.abspath("./codigo_fuente/images/pez azul.png")), # Carga imagen de pez azul
-    pygame.image.load(os.path.abspath("./codigo_fuente/images/pez morado.png")), # Carga imagen de pez morado
-    pygame.image.load(os.path.abspath("./codigo_fuente/images/pez rojo.png")),  # Carga imagen de pez rojo
-    pygame.image.load(os.path.abspath("./codigo_fuente/images/pez verde.png")), # Carga imagen de pez verde
-    pygame.image.load(os.path.abspath("./codigo_fuente/images/pez_globo.png")), # Imagen pez globo
-    pygame.image.load(os.path.abspath("./codigo_fuente/images/tiburon.png"))] # Imagen tiburon
+    imagenes_peces = [pygame.image.load("images/pez azul.png"), # Carga imagen de pez azul
+    pygame.image.load("images/pez morado.png"), # Carga imagen de pez morado
+    pygame.image.load("images/pez rojo.png"),  # Carga imagen de pez rojo
+    pygame.image.load("images/pez verde.png"), # Carga imagen de pez verde
+    pygame.image.load("images/pez_globo.png"), # Imagen pez globo
+    pygame.image.load("images/tiburon.png")] # Imagen tiburon
     imagenes_peces[0] = pygame.transform.scale(imagenes_peces[0], (59, 53)) # Escalar la imagen pez azul
     imagenes_peces[1] = pygame.transform.scale(imagenes_peces[1], (67, 51)) # Escalar la imagen pez morado
     imagenes_peces[2] = pygame.transform.scale(imagenes_peces[2], (161, 76)) # Escalar la imagen pez rojo
@@ -249,7 +249,7 @@ def Escena2(configuracion, screen):
     
     #boton_musica = botones.Iniciar_boton(0, 670, 10)
 
-    Reproducir_musica(os.path.abspath("./codigo_fuente/sounds/background_music.wav"), 0.6, 3) # Musica de fondo
+    Reproducir_musica("sounds/background_music.wav", 0.6, 3) # Musica de fondo
     anz = Anzuelo(rectangulo_anzuelo, img_anzuelo) # Crea una instancia del anzuelo
 
     while continuar:
@@ -313,7 +313,7 @@ def Escena3(configuracion, screen):
     global puntos2
 
     # Cargar imagenes ---
-    img_fondo_playa = pygame.image.load(os.path.abspath("./codigo_fuente/images/fondo_playa.png"))
+    img_fondo_playa = pygame.image.load("images/fondo_playa.png")
 
     # botones----
     boton_casa = botones.Iniciar_boton(1, 250, 310)
