@@ -24,3 +24,12 @@
      pip install tkinter
      pip install pyttsx3
 ```
+
+## Al ejecutar el programa :mag:
+
+### ~Evidencia de Solicitud:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Login1.PNG)   
+### ~Evidencia de Ingreso:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Login2.PNG)   
+### ~Evidencia de Registro:
+![Aquí la descripción de la imagen por si no carga](https://github.com/Sebastian2000pk/Juego-de-Pesca/blob/main/Evidencias/Login3.PNG)   
