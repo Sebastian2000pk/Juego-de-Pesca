@@ -5,7 +5,7 @@ import random
 def imprimir():
     file = open("frases_inicio.txt","r")
     lista_datos = file.readlines()
-    posicion = random.randint(0,24)
+    posicion = random.randint(0,23)
     return lista_datos[posicion]
 
 def manitas_a_la_obra(texto_limpio):
@@ -15,7 +15,7 @@ def manitas_a_la_obra(texto_limpio):
 
 def fraccionar(texto):
     lineas = [linea for linea in texto.split('\n') if linea != '']
-    lineas = lineas[87:111]                                                               #El numero se obtuvo de la posicion en el html
+    lineas = lineas[88:111]                                                               #El numero se obtuvo de la posicion en el html
     texto_limpio = '\n'.join(lineas)
     manitas_a_la_obra(texto_limpio)
 
