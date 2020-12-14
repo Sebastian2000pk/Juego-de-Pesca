@@ -1,4 +1,4 @@
-Los ultimos commit fueron realizados ya pasada la fecha, ya que hubieron poblemas al intentar hacerlos,
+Los ultimos commits fueron realizados ya pasada la fecha, ya que hubieron poblemas al intentar hacerlos,
 y en un momento al intentar forzarlo, se eliminaron unos commits que se habian realizado.  Estuvimos bastante averiguando
 las causas de esto y como solucionarlo (al final es problema es que habia que hacer un pull --rebase).
 Pedimos disculpas por esto, no sabiamos como solucionarlos y la primera opcion que nos dieron fue el --force
